@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanghuadi.cms.dao.SpecialMapper">
+
+  <resultMap id="BaseResultMap" type="com.wanghuadi.cms.domain.Special">
+    <id column="id" jdbcType="INTEGER" property="id" />
+     <result column="title" property="title" jdbcType="VARCHAR"/>
+     <result column="abstracts" property="abstracts" jdbcType="VARCHAR"/>
+    <result column="created" property="created" jdbcType="TIMESTAMP"/>
+    
+    <result column="acount" property="acount" jdbcType="INTEGER"/>
+  </resultMap>
+
+	<!-- 专题列表展示 -->
+	<select id="querySpecial" resultMap="BaseResultMap">
+		select s.id,s.title,s.created,COUNT(a.id) as acount from cms_special s,cms_special_article sa ,cms_article a
+		where s.id = sa.sid and sa.aid = a.id GROUP BY s.id
+	</select>
+  
+  <!-- 专题回显 -->
+  <select id="querySpecialById" parameterType="int" resultMap="BaseResultMap">
+  		select * from cms_special where id=#{id}
+  </select>
+  
+  <!-- 根据专题id  查询该专题下所有的文章信息 -->
+  <select id="queryArticleInfoBySid" parameterType="int" resultType="com.wanghuadi.cms.domain.Article">
+  	select a.id,a.title,a.created from cms_special s,cms_special_article sa,cms_article a
+	where s.id = sa.sid and sa.aid = a.id and s.id = #{id}
+  </select>
+  
+  <!-- 添加文章  追加到中间表 -->
+  <insert id="addSA" parameterType="map">
+  	insert into cms_special_article
+  	(sid,aid)
+  	values
+  	(#{sid},#{aid})
+  
+  </insert>
+  
+</mapper>
